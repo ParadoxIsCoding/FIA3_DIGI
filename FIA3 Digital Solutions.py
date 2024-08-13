@@ -1,4 +1,3 @@
-# FIA3 Digital Solutions Assignment, Taha Salman, 2024 
 import sys
 import sqlite3
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView
@@ -39,6 +38,7 @@ class DataBreachTracker(QMainWindow):
                     border-radius: 5px;
                     padding: 5px;
                     background-color: white;
+                    color: black;
                 }
                 QLineEdit:focus {
                     border: 1px solid #4CAF50;
@@ -73,12 +73,14 @@ class DataBreachTracker(QMainWindow):
                 border: 1px solid #ccc;
                 border-radius: 5px;
                 background-color: white;
+                color: black;
             }
             QHeaderView::section {
                 background-color: #f2f2f2;
                 padding: 5px;
                 border: 1px solid #ccc;
                 font-weight: bold;
+                color: black;
             }
         """)
         self.layout.addWidget(self.table)
