@@ -1,8 +1,53 @@
 import sys
 import sqlite3
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
+
+class LoginScreen(QWidget):
+    def __init__(self, on_login):
+        super().__init__()
+        self.on_login = on_login
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.username_input = QLineEdit()
+        self.username_input.setPlaceholderText("Username")
+        self.password_input = QLineEdit()
+        self.password_input.setPlaceholderText("Password")
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+
+        login_button = QPushButton("Login")
+        login_button.clicked.connect(self.login)
+
+        for widget in (self.username_input, self.password_input, login_button):
+            widget.setStyleSheet("""
+                QLineEdit, QPushButton {
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    padding: 5px;
+                    background-color: white;
+                    color: black;
+                }
+                QLineEdit:focus {
+                    border: 1px solid #4CAF50;
+                }
+                QPushButton {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+            """)
+            layout.addWidget(widget)
+
+    def login(self):
+        # For this example, we accept any username and password
+        self.on_login()
 
 class DataBreachTracker(QMainWindow):
     def __init__(self):
@@ -11,16 +56,26 @@ class DataBreachTracker(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
         self.setStyleSheet("background-color: #f0f0f0;")
 
-        self.central_widget = QWidget()
+        self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout(self.central_widget)
+
+        self.login_screen = LoginScreen(self.show_main_screen)
+        self.main_screen = QWidget()
+
+        self.central_widget.addWidget(self.login_screen)
+        self.central_widget.addWidget(self.main_screen)
 
         self.conn = None
         self.cursor = None
         self.setup_database()
-        self.setup_ui()
+        self.setup_main_ui()
 
-    def setup_ui(self):
+    def show_main_screen(self):
+        self.central_widget.setCurrentWidget(self.main_screen)
+
+    def setup_main_ui(self):
+        layout = QVBoxLayout(self.main_screen)
+
         # Input fields
         input_layout = QHBoxLayout()
 
@@ -62,7 +117,7 @@ class DataBreachTracker(QMainWindow):
         self.add_button.clicked.connect(self.add_entry)
         input_layout.addWidget(self.add_button)
 
-        self.layout.addLayout(input_layout)
+        layout.addLayout(input_layout)
 
         # Table
         self.table = QTableWidget(0, 3)
@@ -83,7 +138,7 @@ class DataBreachTracker(QMainWindow):
                 color: black;
             }
         """)
-        self.layout.addWidget(self.table)
+        layout.addWidget(self.table)
 
         self.load_data()
 
