@@ -17,7 +17,6 @@ class LoginScreen(QWidget):
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
 
-        # Create a central widget to hold the login elements
         central_widget = QWidget()
         central_layout = QVBoxLayout(central_widget)
         
@@ -31,16 +30,12 @@ class LoginScreen(QWidget):
         login_button.clicked.connect(self.login)
 
         for widget in (self.username_input, self.password_input, login_button):
-            widget.setFixedSize(200, 30)  # Make widgets smaller
+            widget.setFixedSize(200, 30)
             central_layout.addWidget(widget, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        # Add some spacing
         central_layout.addSpacing(20)
-
-        # Center the central widget
         main_layout.addWidget(central_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Apply styles
         self.setStyleSheet("""
             QWidget {
                 background-color: #f0f0f0;
@@ -68,7 +63,6 @@ class LoginScreen(QWidget):
         """)
 
     def login(self):
-        # For this example, we accept any username and password
         self.on_login()
 
 class DataBreachTracker(QMainWindow):
@@ -98,9 +92,18 @@ class DataBreachTracker(QMainWindow):
     def setup_main_ui(self):
         layout = QVBoxLayout(self.main_screen)
 
+        # Search bar
+        search_layout = QHBoxLayout()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search...")
+        self.search_button = QPushButton("Search")
+        self.search_button.clicked.connect(self.search_entries)
+        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(self.search_button)
+        layout.addLayout(search_layout)
+
         # Input fields
         input_layout = QHBoxLayout()
-
         self.location_input = QLineEdit()
         self.location_input.setPlaceholderText("Location")
         self.breach_type_input = QLineEdit()
@@ -193,8 +196,23 @@ class DataBreachTracker(QMainWindow):
 
     def load_data(self):
         self.cursor.execute("SELECT location, breach_type, impact FROM breaches")
-        data = self.cursor.fetchall()
+        self.display_data(self.cursor.fetchall())
 
+    def search_entries(self):
+        search_query = self.search_input.text().lower()
+        self.cursor.execute("SELECT location, breach_type, impact FROM breaches")
+        all_data = self.cursor.fetchall()
+        
+        filtered_data = [
+            row for row in all_data
+            if search_query in row[0].lower()
+            or search_query in row[1].lower()
+            or search_query in row[2].lower()
+        ]
+        
+        self.display_data(filtered_data)
+
+    def display_data(self, data):
         self.table.setRowCount(len(data))
         for row, (location, breach_type, impact) in enumerate(data):
             self.table.setItem(row, 0, QTableWidgetItem(location))
