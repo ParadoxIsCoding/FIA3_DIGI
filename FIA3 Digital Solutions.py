@@ -1,7 +1,7 @@
 # FIA3 Digital Solutions, Taha Salman, 2024
 import sys
 import sqlite3
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget, QSpacerItem, QSizePolicy
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt, QSize
 
@@ -12,8 +12,6 @@ class LoginScreen(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setStyleSheet("background-color: #f0f0f0;")
-        
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
 
@@ -36,32 +34,6 @@ class LoginScreen(QWidget):
         central_layout.addSpacing(20)
         main_layout.addWidget(central_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #f0f0f0;
-            }
-            QLineEdit {
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 5px;
-                background-color: white;
-                color: black;
-            }
-            QLineEdit:focus {
-                border: 1px solid #4CAF50;
-            }
-            QPushButton {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 5px;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-        """)
-
     def login(self):
         self.on_login()
 
@@ -70,8 +42,7 @@ class DataBreachTracker(QMainWindow):
         super().__init__()
         self.setWindowTitle("Data Breach Tracker")
         self.setGeometry(100, 100, 800, 600)
-        self.setStyleSheet("background-color: #f0f0f0;")
-
+        
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
@@ -86,11 +57,17 @@ class DataBreachTracker(QMainWindow):
         self.setup_database()
         self.setup_main_ui()
 
+        self.dark_mode = False
+        self.set_style()
+
     def show_main_screen(self):
         self.central_widget.setCurrentWidget(self.main_screen)
 
     def setup_main_ui(self):
-        layout = QVBoxLayout(self.main_screen)
+        main_layout = QVBoxLayout(self.main_screen)
+
+        # Top section
+        top_layout = QVBoxLayout()
 
         # Search bar
         search_layout = QHBoxLayout()
@@ -100,7 +77,7 @@ class DataBreachTracker(QMainWindow):
         self.search_button.clicked.connect(self.search_entries)
         search_layout.addWidget(self.search_input)
         search_layout.addWidget(self.search_button)
-        layout.addLayout(search_layout)
+        top_layout.addLayout(search_layout)
 
         # Input fields
         input_layout = QHBoxLayout()
@@ -118,50 +95,28 @@ class DataBreachTracker(QMainWindow):
         self.add_button.clicked.connect(self.add_entry)
         input_layout.addWidget(self.add_button)
 
-        layout.addLayout(input_layout)
+        top_layout.addLayout(input_layout)
+        main_layout.addLayout(top_layout)
 
         # Table
         self.table = QTableWidget(0, 3)
         self.table.setHorizontalHeaderLabels(["Location", "Breach Type", "Impact"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        layout.addWidget(self.table)
+        main_layout.addWidget(self.table)
 
-        # Apply styles
-        self.main_screen.setStyleSheet("""
-            QLineEdit {
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 5px;
-                background-color: white;
-                color: black;
-            }
-            QLineEdit:focus {
-                border: 1px solid #4CAF50;
-            }
-            QPushButton {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-            QTableWidget {
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                background-color: white;
-                color: black;
-            }
-            QHeaderView::section {
-                background-color: #f2f2f2;
-                padding: 5px;
-                border: 1px solid #ccc;
-                font-weight: bold;
-                color: black;
-            }
-        """)
+        # Bottom section with theme toggle
+        bottom_layout = QHBoxLayout()
+        
+        # Theme toggle button
+        self.theme_button = QPushButton("Theme")
+        self.theme_button.setFixedSize(60, 25)  # Adjusted size to fit text
+        self.theme_button.setToolTip("Toggle Dark/Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        
+        bottom_layout.addWidget(self.theme_button)
+        bottom_layout.addStretch(1)  # This pushes the button to the left
+        
+        main_layout.addLayout(bottom_layout)
 
         self.load_data()
 
@@ -218,6 +173,95 @@ class DataBreachTracker(QMainWindow):
             self.table.setItem(row, 0, QTableWidgetItem(location))
             self.table.setItem(row, 1, QTableWidgetItem(breach_type))
             self.table.setItem(row, 2, QTableWidgetItem(impact))
+
+    def toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        self.set_style()
+
+    def set_style(self):
+        if self.dark_mode:
+            self.setStyleSheet("""
+                QWidget {
+                    background-color: #2b2b2b;
+                    color: #ffffff;
+                }
+                QLineEdit, QTableWidget {
+                    border: 1px solid #555555;
+                    border-radius: 5px;
+                    padding: 5px;
+                    background-color: #3b3b3b;
+                    color: #ffffff;
+                }
+                QLineEdit:focus {
+                    border: 1px solid #4CAF50;
+                }
+                QPushButton {
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 8px 16px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+                QHeaderView::section {
+                    background-color: #3b3b3b;
+                    padding: 5px;
+                    border: 1px solid #555555;
+                    color: #ffffff;
+                }
+            """)
+            self.theme_button.setText("Light")
+        else:
+            self.setStyleSheet("""
+                QWidget {
+                    background-color: #f0f0f0;
+                    color: #000000;
+                }
+                QLineEdit, QTableWidget {
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    padding: 5px;
+                    background-color: white;
+                    color: black;
+                }
+                QLineEdit:focus {
+                    border: 1px solid #4CAF50;
+                }
+                QPushButton {
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 8px 16px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+                QHeaderView::section {
+                    background-color: #f2f2f2;
+                    padding: 5px;
+                    border: 1px solid #ccc;
+                    color: black;
+                }
+            """)
+            self.theme_button.setText("Dark")
+        
+        # Specific style for the theme toggle button
+        self.theme_button.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+        """)
 
     def closeEvent(self, event):
         if self.conn:
