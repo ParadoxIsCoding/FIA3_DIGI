@@ -1,8 +1,9 @@
+# FIA3 Digital Solutions, Taha Salman, 2024
 import sys
 import sqlite3
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget
 from PyQt6.QtGui import QFont, QColor
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 
 class LoginScreen(QWidget):
     def __init__(self, on_login):
@@ -11,9 +12,15 @@ class LoginScreen(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        self.setStyleSheet("background-color: #f0f0f0;")
+        
+        main_layout = QVBoxLayout()
+        self.setLayout(main_layout)
 
+        # Create a central widget to hold the login elements
+        central_widget = QWidget()
+        central_layout = QVBoxLayout(central_widget)
+        
         self.username_input = QLineEdit()
         self.username_input.setPlaceholderText("Username")
         self.password_input = QLineEdit()
@@ -24,26 +31,41 @@ class LoginScreen(QWidget):
         login_button.clicked.connect(self.login)
 
         for widget in (self.username_input, self.password_input, login_button):
-            widget.setStyleSheet("""
-                QLineEdit, QPushButton {
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    padding: 5px;
-                    background-color: white;
-                    color: black;
-                }
-                QLineEdit:focus {
-                    border: 1px solid #4CAF50;
-                }
-                QPushButton {
-                    background-color: #4CAF50;
-                    color: white;
-                }
-                QPushButton:hover {
-                    background-color: #45a049;
-                }
-            """)
-            layout.addWidget(widget)
+            widget.setFixedSize(200, 30)  # Make widgets smaller
+            central_layout.addWidget(widget, alignment=Qt.AlignmentFlag.AlignHCenter)
+
+        # Add some spacing
+        central_layout.addSpacing(20)
+
+        # Center the central widget
+        main_layout.addWidget(central_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        # Apply styles
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #f0f0f0;
+            }
+            QLineEdit {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                background-color: white;
+                color: black;
+            }
+            QLineEdit:focus {
+                border: 1px solid #4CAF50;
+            }
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+        """)
 
     def login(self):
         # For this example, we accept any username and password
@@ -87,22 +109,32 @@ class DataBreachTracker(QMainWindow):
         self.impact_input.setPlaceholderText("Impact")
 
         for input_field in (self.location_input, self.breach_type_input, self.impact_input):
-            input_field.setStyleSheet("""
-                QLineEdit {
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    padding: 5px;
-                    background-color: white;
-                    color: black;
-                }
-                QLineEdit:focus {
-                    border: 1px solid #4CAF50;
-                }
-            """)
             input_layout.addWidget(input_field)
 
         self.add_button = QPushButton("Add Entry")
-        self.add_button.setStyleSheet("""
+        self.add_button.clicked.connect(self.add_entry)
+        input_layout.addWidget(self.add_button)
+
+        layout.addLayout(input_layout)
+
+        # Table
+        self.table = QTableWidget(0, 3)
+        self.table.setHorizontalHeaderLabels(["Location", "Breach Type", "Impact"])
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        layout.addWidget(self.table)
+
+        # Apply styles
+        self.main_screen.setStyleSheet("""
+            QLineEdit {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                background-color: white;
+                color: black;
+            }
+            QLineEdit:focus {
+                border: 1px solid #4CAF50;
+            }
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
@@ -113,17 +145,6 @@ class DataBreachTracker(QMainWindow):
             QPushButton:hover {
                 background-color: #45a049;
             }
-        """)
-        self.add_button.clicked.connect(self.add_entry)
-        input_layout.addWidget(self.add_button)
-
-        layout.addLayout(input_layout)
-
-        # Table
-        self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(["Location", "Breach Type", "Impact"])
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.table.setStyleSheet("""
             QTableWidget {
                 border: 1px solid #ccc;
                 border-radius: 5px;
@@ -138,7 +159,6 @@ class DataBreachTracker(QMainWindow):
                 color: black;
             }
         """)
-        layout.addWidget(self.table)
 
         self.load_data()
 
