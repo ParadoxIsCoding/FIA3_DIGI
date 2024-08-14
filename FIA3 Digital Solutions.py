@@ -1,7 +1,7 @@
 # FIA3 Digital Solutions, Taha Salman, 2024
 import sys
 import sqlite3
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget, QSpacerItem, QSizePolicy
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget, QSpacerItem, QSizePolicy, QDialog, QTextEdit
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt, QSize
 
@@ -36,6 +36,28 @@ class LoginScreen(QWidget):
 
     def login(self):
         self.on_login()
+
+class DetailView(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Breach Details")
+        self.setGeometry(200, 200, 400, 300)
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.detail_text = QTextEdit()
+        self.detail_text.setReadOnly(True)
+        layout.addWidget(self.detail_text)
+
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(self.close)
+        layout.addWidget(close_button)
+
+    def set_details(self, details):
+        self.detail_text.setHtml(details)
 
 class DataBreachTracker(QMainWindow):
     def __init__(self):
@@ -102,6 +124,7 @@ class DataBreachTracker(QMainWindow):
         self.table = QTableWidget(0, 3)
         self.table.setHorizontalHeaderLabels(["Location", "Breach Type", "Impact"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table.itemDoubleClicked.connect(self.show_detail_view)
         main_layout.addWidget(self.table)
 
         # Bottom section with theme toggle
@@ -109,12 +132,12 @@ class DataBreachTracker(QMainWindow):
         
         # Theme toggle button
         self.theme_button = QPushButton("Theme")
-        self.theme_button.setFixedSize(60, 25)  # Adjusted size to fit text
+        self.theme_button.setFixedSize(60, 25)
         self.theme_button.setToolTip("Toggle Dark/Light Mode")
         self.theme_button.clicked.connect(self.toggle_theme)
         
         bottom_layout.addWidget(self.theme_button)
-        bottom_layout.addStretch(1)  # This pushes the button to the left
+        bottom_layout.addStretch(1)
         
         main_layout.addLayout(bottom_layout)
 
@@ -174,6 +197,23 @@ class DataBreachTracker(QMainWindow):
             self.table.setItem(row, 1, QTableWidgetItem(breach_type))
             self.table.setItem(row, 2, QTableWidgetItem(impact))
 
+    def show_detail_view(self, item):
+        row = item.row()
+        location = self.table.item(row, 0).text()
+        breach_type = self.table.item(row, 1).text()
+        impact = self.table.item(row, 2).text()
+
+        details = f"""
+        <h2>Breach Details</h2>
+        <p><strong>Location:</strong> {location}</p>
+        <p><strong>Breach Type:</strong> {breach_type}</p>
+        <p><strong>Impact:</strong> {impact}</p>
+        """
+
+        detail_view = DetailView(self)
+        detail_view.set_details(details)
+        detail_view.exec()
+
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
         self.set_style()
@@ -185,7 +225,7 @@ class DataBreachTracker(QMainWindow):
                     background-color: #2b2b2b;
                     color: #ffffff;
                 }
-                QLineEdit, QTableWidget {
+                QLineEdit, QTableWidget, QTextEdit {
                     border: 1px solid #555555;
                     border-radius: 5px;
                     padding: 5px;
@@ -219,7 +259,7 @@ class DataBreachTracker(QMainWindow):
                     background-color: #f0f0f0;
                     color: #000000;
                 }
-                QLineEdit, QTableWidget {
+                QLineEdit, QTableWidget, QTextEdit {
                     border: 1px solid #ccc;
                     border-radius: 5px;
                     padding: 5px;
@@ -248,7 +288,7 @@ class DataBreachTracker(QMainWindow):
             """)
             self.theme_button.setText("Dark")
         
-        # Specific style for the theme toggle button
+        
         self.theme_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
