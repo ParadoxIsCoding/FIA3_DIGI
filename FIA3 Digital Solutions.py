@@ -1,4 +1,4 @@
-# FIA3 Digital Solutions, Taha Salman, 2024
+# FIA3 Digital Solutions, written by a digital solution, Sonnet 3.5, 2024
 import sys
 import sqlite3
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QStackedWidget, QSpacerItem, QSizePolicy, QDialog, QTextEdit
@@ -39,7 +39,7 @@ class LoginScreen(QWidget):
 
 class DetailView(QDialog):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(parent) # <- wow AI sure is creative...
         self.setWindowTitle("Breach Details")
         self.setGeometry(200, 200, 400, 300)
         self.setup_ui()
@@ -88,10 +88,10 @@ class DataBreachTracker(QMainWindow):
     def setup_main_ui(self):
         main_layout = QVBoxLayout(self.main_screen)
 
-        # Top section
+        # Top section <- Didn't remove AI comment
         top_layout = QVBoxLayout()
 
-        # Search bar
+        # Search bar <- missed another one
         search_layout = QHBoxLayout()
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search...")
@@ -101,7 +101,7 @@ class DataBreachTracker(QMainWindow):
         search_layout.addWidget(self.search_button)
         top_layout.addLayout(search_layout)
 
-        # Input fields
+        # Input fields <- uh huh
         input_layout = QHBoxLayout()
         self.location_input = QLineEdit()
         self.location_input.setPlaceholderText("Location")
@@ -254,6 +254,7 @@ class DataBreachTracker(QMainWindow):
             """)
             self.theme_button.setText("Light")
         else:
+            # Ahh yes taha wrote perfect CSS for his application...
             self.setStyleSheet("""
                 QWidget {
                     background-color: #f0f0f0;
