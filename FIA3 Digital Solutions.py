@@ -313,3 +313,4 @@ if __name__ == "__main__":
     window = DataBreachTracker()
     window.show()
     sys.exit(app.exec())
+# End of project code
